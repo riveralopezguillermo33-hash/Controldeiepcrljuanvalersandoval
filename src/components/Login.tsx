@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import escudo from 'figma:asset/ffa68e596f973ae6cb0c3023782797cbd6c48814.png';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, UserPlus } from 'lucide-react';
 
 interface LoginProps {
   role: 'administrativo' | 'docente' | 'estudiante' | null;
   onBack: () => void;
   onLogin: (username: string) => void;
+  onCrearCuenta?: () => void;
 }
 
 // Credenciales de demostración
@@ -15,7 +16,7 @@ const validCredentials = {
   estudiante: { username: 'estudiante', password: 'estudiante123' },
 };
 
-export function Login({ role, onBack, onLogin }: LoginProps) {
+export function Login({ role, onBack, onLogin, onCrearCuenta }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,8 +27,20 @@ export function Login({ role, onBack, onLogin }: LoginProps) {
     
     if (!role) return;
     
-    // Para administrativo, usar credenciales fijas
+    // Para administrativo, primero buscar en localStorage
     if (role === 'administrativo') {
+      const administradores = JSON.parse(localStorage.getItem('administradores') || '[]');
+      
+      const foundAdmin = administradores.find((admin: any) => 
+        admin.usuario === username && admin.contraseña === password
+      );
+      
+      if (foundAdmin) {
+        onLogin(username);
+        return;
+      }
+      
+      // Si no se encuentra, intentar con credenciales fijas
       const validCreds = validCredentials[role];
       if (username === validCreds.username && password === validCreds.password) {
         onLogin(username);
@@ -127,6 +140,19 @@ export function Login({ role, onBack, onLogin }: LoginProps) {
             Volver
           </button>
         </div>
+
+        {/* Crear Cuenta - Solo para Administrativo */}
+        {role === 'administrativo' && onCrearCuenta && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <button
+              onClick={onCrearCuenta}
+              className="w-full flex items-center justify-center gap-2 text-[#2d5f4d] hover:text-[#234a3a] transition-colors py-2"
+            >
+              <UserPlus className="w-5 h-5" />
+              Crear cuenta
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

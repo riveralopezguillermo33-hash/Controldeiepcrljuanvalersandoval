@@ -3,8 +3,9 @@ import { Welcome } from './components/Welcome';
 import { RoleSelection } from './components/RoleSelection';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
+import { CrearCuenta } from './components/CrearCuenta';
 
-type Screen = 'welcome' | 'role-selection' | 'login' | 'dashboard';
+type Screen = 'welcome' | 'role-selection' | 'login' | 'dashboard' | 'crear-cuenta';
 type Role = 'administrativo' | 'docente' | 'estudiante' | null;
 
 export default function App() {
@@ -37,6 +38,16 @@ export default function App() {
     setCurrentScreen('welcome');
   };
 
+  const handleCrearCuenta = () => {
+    setCurrentScreen('crear-cuenta');
+  };
+
+  const handleCuentaCreada = () => {
+    // Regresar al login de administrativo
+    setSelectedRole('administrativo');
+    setCurrentScreen('login');
+  };
+
   return (
     <div className="min-h-screen">
       {currentScreen === 'welcome' && (
@@ -46,10 +57,13 @@ export default function App() {
         <RoleSelection onRoleSelect={handleRoleSelect} />
       )}
       {currentScreen === 'login' && (
-        <Login role={selectedRole} onBack={handleBack} onLogin={handleLogin} />
+        <Login role={selectedRole} onBack={handleBack} onLogin={handleLogin} onCrearCuenta={handleCrearCuenta} />
       )}
       {currentScreen === 'dashboard' && (
         <Dashboard role={selectedRole} username={loggedInUser} onLogout={handleLogout} />
+      )}
+      {currentScreen === 'crear-cuenta' && (
+        <CrearCuenta onBack={handleBack} onSuccess={handleCuentaCreada} />
       )}
     </div>
   );
